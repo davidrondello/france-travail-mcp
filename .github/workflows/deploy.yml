@@ -18,16 +18,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Préparer SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
         run: |
           install -m 700 -d ~/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_deploy
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          echo "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
 
       # Le serveur met à jour son clone puis reconstruit/redémarre le conteneur.
       # Le .env (secrets) reste uniquement sur le serveur.
       - name: Déployer
+        env:
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          ssh -i ~/.ssh/id_deploy -p "${{ secrets.DEPLOY_PORT || 22 }}" \
-            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
-            "cd '${{ secrets.DEPLOY_PATH }}' && git fetch origin main && git reset --hard origin/main && docker compose up -d --build --remove-orphans && docker image prune -f"
+          ssh -i ~/.ssh/id_deploy -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" \
+            "cd '$DEPLOY_PATH' && git fetch origin main && git reset --hard origin/main && docker compose up -d --build --remove-orphans && docker image prune -f"
