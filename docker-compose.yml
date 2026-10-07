@@ -1,0 +1,12 @@
+# Déploiement derrière Caddy. Le conteneur n'expose aucun port sur l'hôte :
+# Caddy le joint via le réseau Docker partagé (adapter le nom du réseau).
+services:
+  france-travail-mcp:
+    build: .
+    restart: unless-stopped
+    env_file: .env        # FT_CLIENT_ID, FT_CLIENT_SECRET, MCP_PATH_SECRET
+    networks: [caddy]
+
+networks:
+  caddy:
+    external: true

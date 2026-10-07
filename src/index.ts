@@ -21,6 +21,7 @@ import { registerOffresTools } from "./tools/offres.js";
 import { registerRomeTools } from "./tools/rome.js";
 import { registerRomeoTools } from "./tools/romeo.js";
 import { registerLaBonneBoiteTools } from "./tools/labonneboite.js";
+import { startHttpServer } from "./http.js";
 
 // Charge le .env situé à la RACINE du projet (un cran au-dessus de dist/),
 // afin qu'il soit trouvé même lorsque le serveur est lancé depuis un autre dossier
@@ -42,9 +43,7 @@ function validateEnv(): void {
   }
 }
 
-async function main(): Promise<void> {
-  validateEnv();
-
+function buildServer(): McpServer {
   const server = new McpServer({
     name: "france-travail-mcp",
     version: "0.1.0",
@@ -62,8 +61,21 @@ async function main(): Promise<void> {
     registerLaBonneBoiteTools(server);
   }
 
+  return server;
+}
+
+async function main(): Promise<void> {
+  validateEnv();
+
+  // MCP_TRANSPORT=http : serveur Streamable HTTP (déploiement distant, ex. Docker
+  // derrière Caddy). Par défaut : stdio (usage local).
+  if (process.env.MCP_TRANSPORT === "http") {
+    startHttpServer(buildServer);
+    return;
+  }
+
   const transport = new StdioServerTransport();
-  await server.connect(transport);
+  await buildServer().connect(transport);
   console.error("[france-travail-mcp] Serveur démarré (transport stdio).");
 }
 
