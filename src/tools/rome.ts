@@ -37,7 +37,6 @@ export function registerRomeTools(server: McpServer): void {
         query: z.string().min(2).describe("Terme recherché (ex. 'boulanger', 'développeur', 'infirmier')"),
         limit: z.number().int().min(1).max(50).optional().describe("Nombre max de résultats (défaut 15)"),
       },
-      outputSchema: { count: z.number(), metiers: z.array(metierResultSchema) },
       annotations: READ_ONLY,
     },
     async (args) => {

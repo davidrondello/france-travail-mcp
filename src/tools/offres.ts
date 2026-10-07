@@ -94,7 +94,6 @@ export function registerOffresTools(server: McpServer): void {
         limit: z.number().int().min(1).max(150).optional().describe("Nombre d'offres (défaut 15, max 150)"),
         response_format: z.enum(["markdown", "json"]).optional().describe("Format du texte (défaut markdown)"),
       },
-      outputSchema: searchOutputSchema,
       annotations: READ_ONLY,
     },
     async (args) => {
