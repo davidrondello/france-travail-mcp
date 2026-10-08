@@ -1,12 +1,9 @@
-# Déploiement derrière Caddy. Le conteneur n'expose aucun port sur l'hôte :
-# Caddy le joint via le réseau Docker partagé (adapter le nom du réseau).
+# Caddy tourne sur l'hôte : le conteneur publie son port uniquement sur la boucle
+# locale (jamais exposé directement sur Internet), Caddy le joint en 127.0.0.1:3000.
 services:
   france-travail-mcp:
     build: .
     restart: unless-stopped
     env_file: .env        # FT_CLIENT_ID, FT_CLIENT_SECRET, MCP_PATH_SECRET
-    networks: [caddy]
-
-networks:
-  caddy:
-    external: true
+    ports:
+      - "127.0.0.1:3000:3000"

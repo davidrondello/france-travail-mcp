@@ -1,5 +1,6 @@
-# À ajouter dans le Caddyfile du serveur (si Caddy tourne en Docker sur le réseau "caddy").
-# Si Caddy tourne sur l'hôte : publier le port en 127.0.0.1:3000:3000 et utiliser reverse_proxy 127.0.0.1:3000.
+# À ajouter dans le Caddyfile de l'hôte (Caddy installé hors Docker).
+# Si Caddy tourne dans Docker : le mettre sur le même réseau que le conteneur
+# et utiliser reverse_proxy france-travail-mcp:3000.
 mcp-ft.example.fr {
-	reverse_proxy france-travail-mcp:3000
+	reverse_proxy 127.0.0.1:3000
 }
